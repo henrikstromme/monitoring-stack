@@ -1,0 +1,30 @@
+name: Monitoring Stack CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install promtool
+        run: |
+          wget https://github.com/prometheus/prometheus/releases/download/v2.54.1/prometheus-2.54.1.linux-amd64.tar.gz
+          tar xvf prometheus-*.tar.gz
+          sudo mv prometheus-*/promtool /usr/local/bin/
+
+      - name: Validate Prometheus config
+        run: promtool check config prometheus.yml
+
+      - name: Validate Alert rules
+        run: promtool check rules alerts.yml
+
+      - name: Validate docker-compose.yml
+        run: docker compose config
+        
