@@ -1,0 +1,12 @@
+---
+groups:
+  - name: webapp-alerts
+    rules:
+      - alert: HighRequestRate
+        expr: webapp_requests_total > 100
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: "High request rate"
+          description: "High request rate on webapp:\n VALUE = {{ $value }}/100"

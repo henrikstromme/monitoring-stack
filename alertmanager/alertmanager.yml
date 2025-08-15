@@ -1,0 +1,71 @@
+---
+# alertmanager/alertmanager.yml
+global:
+  resolve_timeout: 5m
+  slack_api_url: "https://hooks.slack.com/services/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"
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'henstr3@gmail.com'
+  smtp_auth_username: 'henstr3@gmail.com'
+  smtp_auth_password: 'kjel dcmw aikp sgot'
+  smtp_require_tls: true
+
+route:
+  # When a new group of alerts is created by an incoming alert, wait at
+  # least 'group_wait' to send the initial notification.
+  # This way ensures that you get multiple alerts for the same group that start
+  # firing shortly after another are batched together on the first
+  # notification.
+  group_wait: 10s
+
+  # When the first notification was sent, wait 'group_interval' to send a batch
+  # of new alerts that started firing for that group.
+  group_interval: 5m
+
+  # If an alert has successfully been sent, wait 'repeat_interval' to
+  # resend them.
+  repeat_interval: 30m
+
+  # A default receiver
+  receiver: "slack-alert"
+
+  routes:
+    - receiver: 'slack-alert'
+      group_wait: 10s
+      match_re:
+        severity: critical|warning
+      continue: true
+
+    - receiver: 'email-alert'
+      group_wait: 10s
+      match_re:
+        severity: critical|warning
+      continue: true
+
+#    - receiver: 'discord-notifications' 
+#      group_wait: 10s
+#      match_re:
+#        severity: critical|warning
+#      continue: true
+
+receivers:
+  - name: 'slack-alert'
+    slack_configs:
+      - channel: '#all-devops-testing'
+        send_resolved: true
+        title: 'Alert testing'
+        text: 'Test message to slack'
+
+  - name: 'email-alert'
+    email_configs:
+      - to: 'henstr3@gmail.com'
+        send_resolved: true
+        headers:
+          subject: '{{ template "custom_mail_subject" . }}'
+        html: '{{ template "custom_mail_html" . }}'
+
+#  - name: 'discord-notifications'
+#    webhook_configs:
+#      - url: 'http://discord-webhook-relay:8080/'
+
+templates:
+  - '/etc/alertmanager/email.tmpl'
