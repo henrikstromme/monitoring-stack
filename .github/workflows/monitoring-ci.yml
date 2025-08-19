@@ -27,4 +27,19 @@ jobs:
 
       - name: Validate docker-compose.yml
         run: docker compose config
+
+      - name: Deploy to k3s
+        run: |
+          helm upgrade --install webapp ./webapp \
+            --set image.tag=${{ github.sha }} \
+            --kubeconfig /path/to/kubeconfig
+
+            # Deploy to staging to test the app health
+            # before deploying to Production
+            - name: Deploy to Staging (Port 5001)
+              run: |
+                cd ~/devops-lab/webapp-stack
+                docker compose -p staging -f docker-compose.staging.yml pull
+                docker compose -p staging -f docker-compose.staging.yml up -d
+
         
