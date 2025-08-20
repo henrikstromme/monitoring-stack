@@ -1,9 +1,9 @@
 ---
 version: "3.8"
 
-networks:
-  monitoring:
-    external: true
+#networks:
+#  monitoring:
+#    external: true
 
 services:
   prometheus:
@@ -14,8 +14,8 @@ services:
       - ./alerts.yml:/etc/prometheus/alerts.yml
     ports:
       - "9090:9090"
-    networks:
-      - monitoring
+#    networks:
+#      - monitoring
 
   grafana:
     image: grafana/grafana:latest
@@ -30,16 +30,16 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=grafanapassword@123
     depends_on:
       - prometheus
-    networks:
-      - monitoring
+#    networks:
+#      - monitoring
 
   loki:
     image: grafana/loki:2.9.0
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
-    networks:
-      - monitoring
+#    networks:
+#      - monitoring
 
   promtail:
     image: grafana/promtail:2.9.0
@@ -51,8 +51,8 @@ services:
     command: -config.file=/etc/promtail/config.yml
     depends_on:
       - loki
-    networks:
-      - monitoring
+#    networks:
+#      - monitoring
 
   alertmanager:
     image: prom/alertmanager
@@ -62,8 +62,8 @@ services:
       - ./alertmanager:/etc/alertmanager
     command:
       - '--config.file=/etc/alertmanager/alertmanager.yml'
-    networks:
-      - monitoring
+#    networks:
+#      - monitoring
 #    depends_on:
 #      - discord-webhook-relay
 
@@ -72,14 +72,6 @@ services:
  #   environment:
  #     - DISCORD_WEBHOOK=${DISCORD_WEBHOOK_URL}
  #   command: flask run --host=0.0.0.0 --port=8080
-
-  node-exporter:
-    image: prom/node-exporter:latest
-    container_name: node-exporter
-    ports:
-      - "9100:9100"
-    networks:
-      - monitoring
 
 volumes:
   grafana-storage:
